@@ -186,3 +186,67 @@ float temperature(OneWire thermometer)
 
     return (float)raw / 16.0;
 }
+
+BatchSize setBatchSize(LiquidCrystal lcd, Keypad kpd)
+{
+    BatchSize batchSize = medium;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Set batchSize:");
+    char key;
+    bool finished = false;
+    while (!finished) {
+      key = kpd.waitForKey();
+      switch (key) {
+        case '1':
+            batchSize = small;
+
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("small");
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '2':
+            batchSize = medium;
+            
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("medium");
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '3':
+            batchSize = big;
+
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("big");
+            lcd.blink();
+
+            delay(20);
+            break;
+            
+        case 'A':
+            finished = true;
+            break;
+
+        case 'B':
+            batchSize = medium;
+
+            finished = true;
+            break;
+      }
+    }
+    return batchSize;
+}
