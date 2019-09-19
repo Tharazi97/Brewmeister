@@ -1,6 +1,195 @@
 #include "Brewing.h"
 
-int readKeypad(LiquidCrystal lcd, Keypad kpd)
+Brewing::Brewing(LiquidCrystal lcd, Keypad kpd, OneWire thermometer, Connecting connectors):
+            this->connectors{ connectors },
+            _mashTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _mashTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _brewTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _brewTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _minutes{ }, _seconds{ }, _miliseconds{ }, _heatUp { false }, batchSize{ medium }
+{
+    _lcd = lcd;
+    _kpd = kpd;
+    _thermometer = thermometer;
+}
+
+Brewing::Brewing():
+            _mashTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _mashTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _brewTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _brewTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
+            _minutes{ }, _seconds{ }, _miliseconds{ }, _heatUp { false }, batchSize{ medium }
+{
+
+}
+
+void Brewing::setLcd(LiquidCrystal lcd)
+{
+    _lcd = lcd;
+}
+
+void Brewing::setKeypad(Keypad kpd)
+{
+    _kpd = kpd;
+}
+
+void Brewing::setThermometer(OneWire thermometer)
+{
+    _thermometer = thermometer;
+}
+
+void Brewing::programMashing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd)
+{
+    for (int i = 0 ; i < 10 ; ++i) {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Set mashTemp" + String(i + 1) + ":");
+        _mashTemperature[i] = readKeypad(lcd, kpd);
+
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Set mashTime" + String(i + 1) + ":");
+        _mashTime[i] = readKeypad(lcd, kpd);
+        if ((_mashTemperature[i] == 0) || (_mashTime[i] == 0)) {
+            break;
+        }
+    }
+}
+
+void Brewing::programBrewing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd)
+{
+    for (int i = 0 ; i < 10 ; ++i) {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Set brewTemp" + String(i + 1) + ":");
+        _brewTemperature[i] = readKeypad(lcd, kpd);
+
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Set brewTime" + String(i + 1) + ":");
+        _brewTime[i] = readKeypad(lcd, kpd);
+        if ((_brewTemperature[i] == 0) || (_brewTime[i] == 0)) {
+            break;
+        }
+    }
+}
+
+int Brewing::mash()
+{
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Mash start");
+    while (_kpd.waitForKey() != 'A'); // Wait for button A
+
+    heatUp(_mashTemperature[0]);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Begin mashing");
+    while (kpd.waitForKey() != 'A'); // Wait for button A
+
+    fill(_mashTemperature[0]);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("First pause");
+    while (kpd.waitForKey() != 'A'); // Wait for button A
+}
+
+int Brewing::heatUp(int desiredTemp)
+{
+    if(desiredTemp == 0) return -1;
+
+    float temp = 0.0;
+    temp = temperature();
+    delay(500);
+    temp = temperature();
+
+    _lcd.clear();
+    _lcd.noBlink();
+
+    while (temp < desiredTemp) {
+        temp = temperature();
+        digitalWrite(connectors.heater, HIGH);
+        //Serial.print(temp); // Debug
+
+        _lcd.clear();
+        _lcd.setCursor(0, 0);
+        _lcd.print("Heating up");
+        _lcd.setCursor(0, 1);
+        _lcd.print(temp);
+    }
+    digitalWrite(connectors.heater, LOW);
+    digitalWrite(connectors.buzzer, HIGH);
+
+    // HEATING DONE
+
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Heating done");
+
+    while (_kpd.waitForKey() != 'A'); // Wait for button A
+    digitalWrite(connectors.buzzer, LOW);
+    return 0;
+}
+
+int Brewing::fill(int desiredTemp)
+{
+    if(desiresTemp == 0) return -1;
+    if(batchSize == big) {
+        while (digitalRead(connectors.sensor2) == LOW) {
+            digitalWrite(connectors.pump, HIGH);
+
+            temp = temperature();
+            _lcd.clear();
+            _lcd.setCursor(0, 0);
+            _lcd.print("Filling");
+            _lcd.setCursor(0, 1);
+            _lcd.print(temp);
+
+            if (temp < desiredTemp) {
+                digitalWrite(connectors.heater, HIGH);
+            }
+            else if (temp > desiredTemp + 1) {
+                digitalWrite(connectors.heater, LOW);
+            }
+        }
+    } else {
+        while (digitalRead(connectors.sensor1) == LOW) {
+            digitalWrite(connectors.pump, HIGH);
+
+            temp = temperature();
+            _lcd.clear();
+            _lcd.setCursor(0, 0);
+            _lcd.print("Filling");
+            _lcd.setCursor(0, 1);
+            _lcd.print(temp);
+
+            if (temp < desiredTemp) {
+                digitalWrite(connectors.heater, HIGH);
+            }
+            else if (temp > desiredTemp + 1) {
+                digitalWrite(connectors.heater, LOW);
+            }
+        }
+    }
+    digitalWrite(connectors.heater, LOW);
+    digitalWrite(connectors.pump, LOW);
+    digitalWrite(connectors.buzzer, HIGH);
+
+    // FILLING DONE
+
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Filling done");
+
+    delay(500);
+    digitalWrite(connectors.buzzer, LOW);
+    
+    return 0;
+}
+
+int Brewing::readKeypad(LiquidCrystal lcd, Keypad kpd)
 {
     char key;
     int ret = 0;
@@ -139,7 +328,7 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd)
     }
 };
 
-float temperature(OneWire thermometer)
+float Brewing::temperature(OneWire thermometer)
 {
     byte data[12];
     byte addr[8];
@@ -182,7 +371,7 @@ float temperature(OneWire thermometer)
     return (float)raw / 16.0;
 }
 
-BatchSize setBatchSize(LiquidCrystal lcd, Keypad kpd)
+Brewing::BatchSize Brewing::setBatchSize(LiquidCrystal lcd, Keypad kpd)
 {
     BatchSize batchSize = medium;
     lcd.clear();
