@@ -9,8 +9,8 @@
 #define sensor1 13
 #define sensor2 12
 
-Timer timprzerwa;
-Timer timbuzzer;
+Timer timPause;
+Timer timBuzzer;
 
 LiquidCrystal lcd(49, 47, 45, 43, 41, 40);
 
@@ -28,415 +28,463 @@ byte rowPins[ROWS] = {24, 25, 26, 27};
 byte colPins[COLS] = {28, 29, 30, 31};
 Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-int zczytajk()
+/*
+ * Function used to read value from keypad and display it on the LCD.
+ * Press A to accept value.
+ * Press B to cancel entering value.
+ * Press C to delete last character.
+ */
+int readKeypad(LiquidCrystal lcd, Keypad kpd)
 {
-  char k;
-  bool b = false;
-  int wyjscie=0;
-  lcd.setCursor(0, 1); //Ustawienie kursora
-  lcd.print(String(wyjscie)); //Wyświetlenie tekstu
+  char key;
+  bool finished = false;
+  int ret=0;
+
+  lcd.setCursor(0, 1);
+  lcd.print(String(ret));
   lcd.blink();
-  while (b==false)
+
+  while (!finished)
   {
-    k = kpd.waitForKey();
-      switch (k)
+    key = kpd.waitForKey();
+      switch (key)
       {
-      case '1':
-          wyjscie = wyjscie * 10 + 1;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '2':
-          wyjscie = wyjscie * 10 + 2;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '3':
-          wyjscie = wyjscie * 10 + 3;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '4':
-          wyjscie = wyjscie * 10 + 4;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '5':
-          wyjscie = wyjscie * 10 + 5;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '6':
-          wyjscie = wyjscie * 10 + 6;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '7':
-          wyjscie = wyjscie * 10 + 7;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '8':
-          wyjscie = wyjscie * 10 + 8;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '9':
-          wyjscie = wyjscie * 10 + 9;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case '0':
-          wyjscie = wyjscie * 10 + 0;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      case 'A':
-          b=true;
-          break;
-      case 'B':
-          wyjscie = 0;
-          b=true;
-          break;
-      case 'C':
-          wyjscie = wyjscie / 10;
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.print(" "); //Wyświetlenie tekstu
-          lcd.setCursor(0, 1); //Ustawienie kursora
-          lcd.print(String(wyjscie)); //Wyświetlenie tekstu
-          lcd.blink();
-          delay(20);
-          break;
-      default:
-          break;
+        case '1':
+            ret = ret * 10 + 1;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '2':
+            ret = ret * 10 + 2;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '3':
+            ret = ret * 10 + 3;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '4':
+            ret = ret * 10 + 4;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '5':
+            ret = ret * 10 + 5;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '6':
+            ret = ret * 10 + 6;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '7':
+            ret = ret * 10 + 7;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '8':
+            ret = ret * 10 + 8;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '9':
+            ret = ret * 10 + 9;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '0':
+            ret = ret * 10 + 0;
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case 'A':
+            finished=true;
+            break;
+
+        case 'B':
+            ret = 0;
+            finished=true;
+            break;
+
+        case 'C':
+            ret = ret / 10;
+
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print(String(ret));
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        default:
+            break;
       }
   }
 
-  Serial.print(wyjscie);
-  return wyjscie;
+  // Serial.print(ret); // Debug
+  return ret;
 }
 
-float temperatura()
+/*
+ * Function returns temperature in celsius degrees as float.
+ */
+float temperature(OneWire thermometer)
 {
-  byte i;
-  byte present = 0;
   byte data[12];
   byte addr[8];
-  float celsius;
+
   do 
   {
-    ds.reset_search();
-  }while( !ds.search(addr)) ;
+    thermometer.reset_search();
+  }while( !thermometer.search(addr));
 
   if (OneWire::crc8(addr, 7) != addr[7]) {
-      Serial.println("CRC is not valid!");
+      Serial.println("CRC is not valid!"); // Debug
   }
  
+  thermometer.reset();
+  thermometer.select(addr);
+  thermometer.write(0x44, 1);        // start conversion, with parasite power on at the end
 
-  ds.reset();
-  ds.select(addr);
-  ds.write(0x44, 1);        // start conversion, with parasite power on at the end
-
-  delay(100);
-  // we might do a ds.depower() here, but the reset will take care of it.
+  delay(100); //!!!! needed?
+  // we might do a thermometer.depower() here, but the reset will take care of it.
   
-  present = ds.reset();
-  ds.select(addr);    
-  ds.write(0xBE);         // Read Scratchpad
+  thermometer.reset();
+  thermometer.select(addr);    
+  thermometer.write(0xBE);         // Read Scratchpad
 
-  for ( i = 0; i < 9; i++) {           // we need 9 bytes
-    data[i] = ds.read();
+  for (int i = 0; i < 9; ++i) {           // we need 9 bytes
+    data[i] = thermometer.read();
   }
 
   int16_t raw = (data[1] << 8) | data[0];
   
-  delay(200);
+  delay(200); //!!!! needed?
   
-    byte cfg = (data[4] & 0x60);
-    // at lower res, the low bits are undefined, so let's zero them
-    if (cfg == 0x00) raw = raw & ~7;  // 9 bit resolution, 93.75 ms
+  byte cfg = (data[4] & 0x60);
+  // at lower res, the low bits are undefined, so let's zero them
+  if (cfg == 0x00) raw = raw & ~7;  // 9 bit resolution, 93.75 ms
 
-   delay(200);
+  delay(200); //!!!! needed?
 
-
-  celsius = (float)raw / 16.0;
-  return celsius;
+  return (float)raw / 16.0;
 }
-
-
-
 
 void setup(void) {
   //Serial.begin(9600);
   lcd.begin(16, 2);
-  pinMode(grzalka, OUTPUT);
-  pinMode(pompa, OUTPUT);
+
+  pinMode(heater, OUTPUT);
+  pinMode(pump, OUTPUT);
   pinMode(buzzer, OUTPUT);
-  pinMode(czuj1, INPUT);
-  pinMode(czuj2, INPUT);
-  timprzerwa.begin(200);
-  timbuzzer.begin(200);
+
+  pinMode(sensor1, INPUT);
+  pinMode(sensor2, INPUT);
+
+  timPause.begin(200);
+  timBuzzer.begin(200);
   delay(200);
 }
 
 void loop(void) {
-  
-  int tempZ[11]={0,0,0,0,0,0,0,0,0,0,0};
-  int tempW[11]={0,0,0,0,0,0,0,0,0,0,0};
-  unsigned long czasZ[11]={0,0,0,0,0,0,0,0,0,0,0};
-  unsigned long czasW[11]={0,0,0,0,0,0,0,0,0,0,0};
-  unsigned long minuty, sekundy, mili;
-  bool podgrzewaj;
+  int mashTemperature[10] = {0,0,0,0,0,0,0,0,0,0,0};
+  unsigned long mashTime[10] = {0,0,0,0,0,0,0,0,0,0,0};
+
+  int brewTemperature[10] = {0,0,0,0,0,0,0,0,0,0,0};  
+  unsigned long brewTime[10] = {0,0,0,0,0,0,0,0,0,0,0};
+
+  unsigned long minutes, seconds, miliseconds;
+  bool heatUp;
 
                                                   //
-                                                  //programowanie
+                                                  // PROGRAMMING
                                                   //
 
-  // ZACIERANIE
-  for (int i=0 ; i<11 ; i++)
+  // MASH
+  for (int i=0 ; i<10 ; ++i)
   {
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Ustaw tempZ" + String(i) + ":");
-    tempZ[i] = zczytajk();
+    lcd.print("Set mashTemp" + String(i+1) + ":");
+    mashTemperature[i] = readKeypad(lcd, kpd);
     
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Ustaw czasZ" + String(i) + ":");
-    czasZ[i] = zczytajk();
-    if((tempZ[i]==0) || (czasZ[i]==0)) i=11;
+    lcd.print("Set mashTime" + String(i+1) + ":");
+    mashTime[i] = readKeypad(lcd, kpd);
+    if((mashTemperature[i]==0) || (mashTime[i]==0)) break;
   }
 
-  // WARZENIE
-  for (int i=0 ; i<11 ; i++)
+  // BREW
+  for (int i=0 ; i<10 ; ++i)
   {
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Ustaw tempW" + String(i) + ":");
-    tempW[i] = zczytajk();
+    lcd.print("Set brewTemp" + String(i+1) + ":");
+    brewTemperature[i] = readKeypad(lcd, kpd);
     
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Ustaw czasW" + String(i) + ":");
-    czasW[i] = zczytajk();
-    if((tempW[i]==0) || (czasW[i]==0)) i=11;
+    lcd.print("Set brewTime" + String(i+1) + ":");
+    brewTime[i] = readKeypad(lcd, kpd);
+    if((brewTemperature[i]==0) || (brewTime[i]==0)) break;
   }
   
-  //for (int i=0 ; i<11 ; i++)
+  //for (int i=0 ; i<10 ; i++) //Debug
   // {
-  //  Serial.print(czasZ[i]);
+  //  Serial.print(mashTime[i]);
   // }
                                                                 //
-                                                                //ZACIERANIE
+                                                                // MASHING
                                                                 //
   
-  // PODGRZEWANIE
-  float termometr= 0.0;
-  termometr = temperatura();
+  // HEATING UP
+  float temp= 0.0;
+  temp = temperature(thermometer);
   delay(500);
-  termometr = temperatura();
+  temp = temperature(thermometer);
+
   lcd.clear();
   lcd.noBlink();
-  for(;termometr<(tempZ[0]+2);)
+
+  while(temp < (mashTemperature[0]+2))
   {
-    termometr= temperatura();
-    digitalWrite(grzalka, HIGH);
-    Serial.print(termometr);
+    temp = temperature(thermometer);
+    digitalWrite(heater, HIGH);
+    //Serial.print(temp); // Debug
 
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Podgrzewanie");
+    lcd.print("Heating up");
     lcd.setCursor(0, 1); 
-    lcd.print(termometr);
+    lcd.print(temp);
   }
-  digitalWrite(grzalka, LOW);
+  digitalWrite(heater, LOW);
   digitalWrite(buzzer, HIGH);
 
-  // PODGRZALO
+  // HEATING DONE
   
-  while(kpd.waitForKey()!='A'); //czekaj na A
+  while(kpd.waitForKey()!='A'); // Wait for button A
   digitalWrite(buzzer, LOW);
 
   lcd.clear();
   lcd.setCursor(0, 0); 
-  lcd.print("Start zacieranie");
-  while(kpd.waitForKey()!='A'); //czekaj na A
+  lcd.print("Begin mashing");
+  while(kpd.waitForKey()!='A'); // Wait for button A
 
   
-  // ZACZNIJ NAPELNIANIE
-  while(digitalRead(czuj2)==LOW)
+  // FILLING
+  while(digitalRead(sensor1) == LOW)
   {
-    digitalWrite(pompa, HIGH);
+    digitalWrite(pump, HIGH);
     
-    termometr= temperatura();
+    temp= temperature(thermometer);
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("napelnianie");
+    lcd.print("Filling");
     lcd.setCursor(0, 1); 
-    lcd.print(termometr);
+    lcd.print(temp);
     
-    if(termometr<(tempZ[0])) digitalWrite(grzalka, HIGH);
-    if(termometr>tempZ[0]+1) digitalWrite(grzalka, LOW);
+    if(temp<(mashTemperature[0])) digitalWrite(heater, HIGH);
+    if(temp>mashTemperature[0]+1) digitalWrite(heater, LOW);
   }
 
   
-  // KOLEJNE PRZERWY
-  for(int a=0; a<11;a++)
+  // MASHING PAUSES
+  for(int i = 0; i < 10; ++i)
   {
-    if(czasZ[a] == 0) break;
-    timprzerwa.begin(MINS(czasZ[a])-SECS(2));
+    digitalWrite(buzzer, LOW);
+
+    if((mashTime[i] == 0) || (mashTemperature[i] == 0)) break;
+    timPause.begin(MINS(mashTime[i])-SECS(2));
     
-    while(!timprzerwa.available())
+    while(!timPause.available())
     {
-      termometr= temperatura();
+      temp = temperature(thermometer);
+
+      miliseconds= timPause.time()/1000;
+      minutes = miliseconds / 60;
+      seconds = miliseconds % 60;
+
       lcd.clear();
       lcd.setCursor(0, 0); 
-      lcd.print("Do konca: ");
-      mili= timprzerwa.time()/1000;
-      minuty = mili / 60;
-      sekundy = mili % 60;
-      lcd.print(minuty);
+      lcd.print("Time left: ");      
+      lcd.print(minutes);
       lcd.print(".");
-      lcd.print(sekundy);
+      lcd.print(seconds);
       lcd.setCursor(0, 1); 
-      lcd.print(termometr);
+      lcd.print(temp);
       
-      if(termometr<(tempZ[0])) digitalWrite(grzalka, HIGH);
-      if(termometr>tempZ[0]+1) digitalWrite(grzalka, LOW);
+      if(temp<(mashTemperature[i])) digitalWrite(heater, HIGH);
+      if(temp>mashTemperature[i]+1) digitalWrite(heater, LOW);
       
-      if(digitalRead(czuj1)==LOW) digitalWrite(pompa, HIGH);
-      if(digitalRead(czuj2)==HIGH) digitalWrite(pompa, LOW);
+      if(digitalRead(sensor1)==LOW) digitalWrite(pump, HIGH);
+      if(digitalRead(sensor2)==HIGH) digitalWrite(pump, LOW);
     }
     digitalWrite(buzzer, HIGH);
     delay(2000);
     digitalWrite(buzzer, LOW);
   }
   
-  digitalWrite(grzalka, LOW);
-  digitalWrite(pompa, LOW);
+  digitalWrite(heater, LOW);
+  digitalWrite(pump, LOW);
+
   lcd.clear();
   lcd.setCursor(0, 0); 
-  lcd.print("Koniec zacierania");
+  lcd.print("End of mashing");
 
 
-  // ZAKONCZONO ZACIERANIE
-  digitalWrite(buzzer, HIGH);
-  delay(500);
-  digitalWrite(buzzer, LOW);
-  delay(500);
-  digitalWrite(buzzer, HIGH);
-  delay(500);
-  digitalWrite(buzzer, LOW);
-  delay(500);
-  digitalWrite(buzzer, HIGH);
-  delay(500);
-  digitalWrite(buzzer, LOW);
-  delay(500);
-  digitalWrite(buzzer, HIGH);
-  delay(500);
-  digitalWrite(buzzer, LOW);
-  delay(500);
+  // SIGNAL END OF MASHING
+  for(int i = 0; i<5; ++i)
+  {
+    digitalWrite(buzzer, HIGH);
+    delay(500);
+    digitalWrite(buzzer, LOW);
+    delay(500);
+  }
 
+  digitalWrite(buzzer, LOW);
   
-  while(kpd.waitForKey()!='A'); //czekaj na A
+  while(kpd.waitForKey()!='A'); // Wait for button A
   
                                             
                                                     //
-                                                    //Warzenie
+                                                    // BREWING
                                                     //
   lcd.clear();
   lcd.setCursor(0, 0); 
-  lcd.print("Start warzenie?");
-  bool buzz,moc = false;
+  lcd.print("Begin brewing");
 
-  while(kpd.waitForKey()!='A'); //czekaj na A
+  while(kpd.waitForKey()!='A'); // Wait for button A
 
-  // PODGRZEWANIE
-  termometr = temperatura();
-  termometr = temperatura();
+  bool buzz, power = false;
+
+  // HEATING UP
+  temp = temperature(thermometer);
+  temp = temperature(thermometer);
+
   lcd.clear();
   lcd.noBlink();
-  for(;termometr<(tempW[0]);)
+  while(temp < brewTemperature[0])
   {
-    termometr= temperatura();
-    digitalWrite(grzalka, HIGH);
-    Serial.print(termometr);
+    temp = temperature(thermometer);
+    digitalWrite(heater, HIGH);
+    //Serial.print(temp); // Debug
 
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print("Podgrzewanie");
+    lcd.print("Heating up");
     lcd.setCursor(0, 1); 
-    lcd.print(termometr);
+    lcd.print(temp);
 
-    if(kpd.getKey()=='D') break;
+    if(kpd.getKey() =='D') break; // Stop heating if user wants to
   }
 
 
-  // KOLEJNE DAWKI CHMIELU
-  for(int a=0; a<11;a++)
+  // ANOTHER PORTIONS OF HOPS
+  for(int i=0; i<10; i++)
   {
     digitalWrite(buzzer, LOW);
-    if(czasW[a] == 0) break;
-    timprzerwa.begin(MINS(czasW[a]));
-    while(!timprzerwa.available())
+
+    if((brewTime[i] == 0) || (brewTemperature[i] == 0)) break;
+
+    timPause.begin(MINS(brewTime[i]));
+
+    while(!timPause.available())
     {
-      termometr= temperatura();
+      temp= temperature(thermometer);
+
+      miliseconds= timPause.time()/1000;
+      minutes = miliseconds / 60;
+      seconds = miliseconds % 60;
+
       lcd.clear();
       lcd.setCursor(0, 0); 
-      lcd.print("Do konca: ");
-      mili= timprzerwa.time()/1000;
-      minuty = mili / 60;
-      sekundy = mili % 60;
-      lcd.print(minuty);
+      lcd.print("Time left: ");      
+      lcd.print(minutes);
       lcd.print(".");
-      lcd.print(sekundy);
+      lcd.print(seconds);
       lcd.setCursor(0, 1); 
-      lcd.print(termometr);
+      lcd.print(temp);
       
       if(kpd.getKey()=='D')
       {
-        if(moc == true) moc = false;
+        if(moc == true) moc = false; // Enable or disable heating regardless of temperature
         else moc = true;
       }
       
       if(moc == true) 
       {
-        digitalWrite(grzalka, HIGH);
+        digitalWrite(heater, HIGH);
         lcd.setCursor(15, 1); 
         lcd.print("P");
       }
       else
       {
-        if(termometr<(tempW[a]-1)) digitalWrite(grzalka, HIGH);
-        if(termometr>tempW[a]+1) digitalWrite(grzalka, LOW);  
+        if(temp<(brewTemperature[a]-1)) digitalWrite(heater, HIGH);
+        if(temp>brewTemperature[a]+1) digitalWrite(heater, LOW);  
       }      
 
-      if(timprzerwa.time()<SECS(10))
+      if(timPause.time()<SECS(10))
       {
-        if(timbuzzer.available())
+        if(timBuzzer.available())
         {
-          timbuzzer.begin(500);
+          timBuzzer.begin(500);
           if(buzz == false)
           {
             digitalWrite(buzzer, HIGH);
@@ -452,8 +500,8 @@ void loop(void) {
 
     }
   }
-  digitalWrite(grzalka, LOW);
-  digitalWrite(pompa, LOW);
-  digitalWrite(buzzer, LOW);
 
+  digitalWrite(heater, LOW);
+  digitalWrite(pump, LOW);
+  digitalWrite(buzzer, LOW);
 }
