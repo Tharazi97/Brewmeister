@@ -48,18 +48,22 @@ void setup(void)
 
 void loop(void)
 {
-    int mashTemperature[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    unsigned long mashTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int mashTemperature[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    unsigned long mashTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    int brewTemperature[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    unsigned long brewTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int brewTemperature[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    unsigned long brewTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     unsigned long minutes, seconds, miliseconds;
     bool heatUp;
+    BatchSize batchSize = medium;
 
     //
     // PROGRAMMING
     //
+
+    // SIZE
+    batchSize = setBatchSize(lcd, kpd);
 
     // MASH
     for (int i = 0 ; i < 10 ; ++i) {
@@ -281,22 +285,22 @@ void loop(void)
             lcd.print(temp);
 
             if (kpd.getKey() == 'D') {
-                if (moc == true) {
-                    moc = false;    // Enable or disable heating regardless of temperature
+                if (power == true) {
+                    power = false;    // Enable or disable heating regardless of temperature
                 } else {
-                    moc = true;
+                    power = true;
                 }
             }
 
-            if (moc == true) {
+            if (power == true) {
                 digitalWrite(heater, HIGH);
                 lcd.setCursor(15, 1);
                 lcd.print("P");
             } else {
-                if (temp < (brewTemperature[a] - 1)) {
+                if (temp < (brewTemperature[i] - 1)) {
                     digitalWrite(heater, HIGH);
                 }
-                if (temp > brewTemperature[a] + 1) {
+                if (temp > brewTemperature[i] + 1) {
                     digitalWrite(heater, LOW);
                 }
             }

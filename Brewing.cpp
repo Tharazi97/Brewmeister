@@ -3,14 +3,13 @@
 int readKeypad(LiquidCrystal lcd, Keypad kpd)
 {
     char key;
-    bool finished = false;
     int ret = 0;
 
     lcd.setCursor(0, 1);
     lcd.print(String(ret));
     lcd.blink();
 
-    while (!finished) {
+    while (1) {
         key = kpd.waitForKey();
         switch (key) {
             case '1':
@@ -114,13 +113,12 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd)
                 break;
 
             case 'A':
-                finished = true;
-                break;
+                delay(200);
+                return ret;
 
             case 'B':
-                ret = 0;
-                finished = true;
-                break;
+                delay(200);
+                return 0;
 
             case 'C':
                 ret = ret / 10;
@@ -139,10 +137,7 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd)
                 break;
         }
     }
-
-    // Serial.print(ret); // Debug
-    return ret;
-}
+};
 
 float temperature(OneWire thermometer)
 {
@@ -185,4 +180,65 @@ float temperature(OneWire thermometer)
     delay(200); //!!!! needed?
 
     return (float)raw / 16.0;
+}
+
+BatchSize setBatchSize(LiquidCrystal lcd, Keypad kpd)
+{
+    BatchSize batchSize = medium;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Set batchSize:");
+    char key;
+    bool finished = false;
+    while (!finished) {
+      key = kpd.waitForKey();
+      switch (key) {
+        case '1':
+            batchSize = small;
+
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("small");
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '2':
+            batchSize = medium;
+            
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("medium");
+            lcd.blink();
+
+            delay(20);
+            break;
+
+        case '3':
+            batchSize = big;
+
+            lcd.setCursor(0, 1);
+            lcd.print("                ");
+
+            lcd.setCursor(0, 1);
+            lcd.print("big");
+            lcd.blink();
+
+            delay(20);
+            break;
+            
+        case 'A':
+            delay(200);
+            return batchSize;
+
+        case 'B':
+            delay(200);
+            return medium;
+      }
+    }
 }

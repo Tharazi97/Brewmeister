@@ -14,3 +14,8 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd);
  * Function returns temperature in celsius degrees as float.
  */
 float temperature(OneWire thermometer);
+
+enum BatchSize { small, medium, big};
+
+BatchSize setBatchSize(LiquidCrystal lcd, Keypad kpd);
+
