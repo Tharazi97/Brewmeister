@@ -3,18 +3,18 @@
 #include <Timers.h>
 #include <OneWire.h>
 
-#define grzalka 48
-#define pompa 50
-#define buzzer 52
-#define czuj1 46
-#define czuj2 44
+#define heater 3
+#define pump 2
+#define buzzer 6
+#define sensor1 13
+#define sensor2 12
 
 Timer timprzerwa;
 Timer timbuzzer;
 
-LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
+LiquidCrystal lcd(49, 47, 45, 43, 41, 40);
 
-OneWire  ds(10);
+OneWire  thermometer(11);
 
 const byte ROWS = 4;
 const byte COLS = 4;
@@ -24,9 +24,9 @@ char keys[ROWS][COLS] = {
 {'7','8','9','C'},
 {'*','0','#','D'}
 };
-byte rowPins[ROWS] = {36, 34, 32, 30};
-byte colPins[COLS] = {28, 26, 24, 22};
-Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+byte rowPins[ROWS] = {24, 25, 26, 27};
+byte colPins[COLS] = {28, 29, 30, 31};
+Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 int zczytajk()
 {
