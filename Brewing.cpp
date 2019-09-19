@@ -3,14 +3,13 @@
 int readKeypad(LiquidCrystal lcd, Keypad kpd)
 {
     char key;
-    bool finished = false;
     int ret = 0;
 
     lcd.setCursor(0, 1);
     lcd.print(String(ret));
     lcd.blink();
 
-    while (!finished) {
+    while (1) {
         key = kpd.waitForKey();
         switch (key) {
             case '1':
@@ -114,13 +113,12 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd)
                 break;
 
             case 'A':
-                finished = true;
-                break;
+                delay(200);
+                return ret;
 
             case 'B':
-                ret = 0;
-                finished = true;
-                break;
+                delay(200);
+                return 0;
 
             case 'C':
                 ret = ret / 10;
@@ -139,10 +137,7 @@ int readKeypad(LiquidCrystal lcd, Keypad kpd)
                 break;
         }
     }
-
-    // Serial.print(ret); // Debug
-    return ret;
-}
+};
 
 float temperature(OneWire thermometer)
 {
@@ -238,15 +233,12 @@ BatchSize setBatchSize(LiquidCrystal lcd, Keypad kpd)
             break;
             
         case 'A':
-            finished = true;
-            break;
+            delay(200);
+            return batchSize;
 
         case 'B':
-            batchSize = medium;
-
-            finished = true;
-            break;
+            delay(200);
+            return medium;
       }
     }
-    return batchSize;
 }
