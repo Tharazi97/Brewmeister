@@ -57,8 +57,8 @@ class Brewing {
     int _brewTemperature[10];
     unsigned long _brewTime[10];
 
-    unsigned long _minutes, _seconds, _miliseconds;
-    bool _heatUp;
+    Timer _timPause;
+    Timer _timBuzzer;
 
     public:
     Connecting connectors;

@@ -6,11 +6,14 @@ Brewing::Brewing(LiquidCrystal lcd, Keypad kpd, OneWire thermometer, Connecting 
             _mashTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
             _brewTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
             _brewTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
-            _minutes{ }, _seconds{ }, _miliseconds{ }, _heatUp { false }, batchSize{ medium }
+            batchSize{ medium }
 {
     _lcd = lcd;
     _kpd = kpd;
     _thermometer = thermometer;
+    _timPause.begin(200);
+    _timBuzzer.begin(200);
+    delay(200);
 }
 
 Brewing::Brewing():
@@ -18,9 +21,11 @@ Brewing::Brewing():
             _mashTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
             _brewTemperature { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
             _brewTime { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } { },
-            _minutes{ }, _seconds{ }, _miliseconds{ }, _heatUp { false }, batchSize{ medium }
+            batchSize{ medium }
 {
-
+    _timPause.begin(200);
+    _timBuzzer.begin(200);
+    delay(200);
 }
 
 void Brewing::setLcd(LiquidCrystal lcd)
@@ -83,16 +88,111 @@ int Brewing::mash()
 
     heatUp(_mashTemperature[0]);
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Begin mashing");
-    while (kpd.waitForKey() != 'A'); // Wait for button A
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Begin mashing");
+    while (_kpd.waitForKey() != 'A'); // Wait for button A
 
     fill(_mashTemperature[0]);
 
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("First pause");
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Is malt inside?");
+    while (_kpd.waitForKey() != 'A'); // Wait for button A
+
+    unsigned long miliseconds, minutes, seconds;
+    float temp;
+
+    // MASHING PAUSES
+    for (int i = 0; i < 10; ++i) {
+        digitalWrite(connectors.buzzer, LOW);
+
+        if ((_mashTime[i] == 0) || (_mashTemperature[i] == 0)) {
+            break;
+        }
+        _timPause.begin(MINS(_mashTime[i]) - SECS(2));
+
+        while (!_timPause.available()) {
+            temp = temperature();
+
+            miliseconds = _timPause.time() / 1000;
+            minutes = miliseconds / 60;
+            seconds = miliseconds % 60;
+
+            _lcd.clear();
+            _lcd.setCursor(0, 0);
+            _lcd.print("Time left: ");
+            _lcd.print(minutes);
+            _lcd.print(".");
+            _lcd.print(seconds);
+            _lcd.setCursor(0, 1);
+            _lcd.print(temp);
+
+            if (temp < _mashTemperature[i]) {
+                digitalWrite(connectors.heater, HIGH);
+            }
+            if (temp > _mashTemperature[i] + 1) {
+                digitalWrite(connectors.heater, LOW);
+            }
+
+            if(batchSize == medium)
+            {
+                if (digitalRead(connectors.sensor1) == LOW) {
+                digitalWrite(connectors.pump, HIGH);
+                }
+                if (digitalRead(connectors.sensor2) == HIGH) {
+                    digitalWrite(connectors.pump, LOW);
+                }
+            }
+            else if(batchSize == big)
+            {
+                if (digitalRead(connectors.sensor2) == LOW) {
+                    digitalWrite(connectors.pump, HIGH);
+                    _timPump.begin(SECS(10));
+                }
+                else if(_timPause.available())
+                {
+                    digitalWrite(connectors.pump, LOW);
+                }
+            }
+            else
+            {
+                if (digitalRead(connectors.sensor1) == HIGH) {
+                    digitalWrite(connectors.pump, LOW);
+                    _timPump.begin(SECS(10));
+                }
+                else if(_timPause.available())
+                {
+                    digitalWrite(connectors.pump, HIGH);
+                }
+            }
+            
+        }
+        digitalWrite(connectors.buzzer, HIGH);
+        delay(2000);
+        digitalWrite(connectors.buzzer, LOW);
+        digitalWrite(connectors.pump, LOW);
+    }
+
+    digitalWrite(connectors.buzzer, LOW);
+    digitalWrite(connectors.heater, LOW);
+    digitalWrite(connectors.pump, LOW);
+
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("End of mashing");
+
+
+    // SIGNAL END OF MASHING
+    for (int i = 0; i < 5; ++i) {
+        digitalWrite(connectors.buzzer, HIGH);
+        delay(500);
+        digitalWrite(connectors.buzzer, LOW);
+        delay(500);
+    }
+
+    digitalWrite(connectors.buzzer, LOW);
+
     while (kpd.waitForKey() != 'A'); // Wait for button A
 }
 
@@ -136,6 +236,9 @@ int Brewing::heatUp(int desiredTemp)
 int Brewing::fill(int desiredTemp)
 {
     if(desiresTemp == 0) return -1;
+    
+    float temp = 0.0;
+
     if(batchSize == big) {
         while (digitalRead(connectors.sensor2) == LOW) {
             digitalWrite(connectors.pump, HIGH);
