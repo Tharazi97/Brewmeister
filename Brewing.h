@@ -16,7 +16,7 @@ struct Connecting {
 
 
 class Brewing {
-    public:
+public:
     explicit Brewing();
     Brewing(LiquidCrystal lcd, Keypad kpd, OneWire thermometer, Connecting connectors);
 
@@ -26,7 +26,7 @@ class Brewing {
     void setLcd(LiquidCrystal lcd);
     void setKeypad(Keypad kpd);
     void setThermometer(OneWire thermometer);
-    
+
     /*
     * Function used to read value from keypad and display it on the LCD.
     * Press A to accept value.
@@ -58,14 +58,14 @@ class Brewing {
     * Press C to delete last character.
     */
     void programBrewing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd);
-    
+
     int mash();
     int brew();
 
     int heatUp(int desiredTemp);
     int fill(int desiredTemp);
 
-    private:
+private:
     LiquidCrystal _lcd;
     Keypad _kpd;
     OneWire _thermometer;
@@ -79,7 +79,7 @@ class Brewing {
     Timer _timPause;
     Timer _timBuzzer;
 
-    public:
+public:
     Connecting connectors;
     BatchSize batchSize;
 };
