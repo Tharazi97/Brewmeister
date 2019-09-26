@@ -3,8 +3,8 @@
 #include <OneWire.h>
 #include <inttypes.h>
 
-#define MAX_PAUSES_MASHING
-#define MAX_PAUSES_BREWING
+#define MAX_PAUSES_MASHING 10
+#define MAX_PAUSES_BREWING 10
 
 struct Connecting {
     uint8_t heater;

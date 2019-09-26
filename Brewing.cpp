@@ -45,7 +45,7 @@ void Brewing::setThermometer(OneWire thermometer)
 
 void Brewing::programMashing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd)
 {
-    for (int i = 0 ; i < 10 ; ++i) {
+    for (int i = 0 ; i < MAX_PAUSES_MASHING ; ++i) {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Set mashTemp" + String(i + 1) + ":");
@@ -63,7 +63,7 @@ void Brewing::programMashing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd)
 
 void Brewing::programBrewing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd)
 {
-    for (int i = 0 ; i < 10 ; ++i) {
+    for (int i = 0 ; i < MAX_PAUSES_BREWING ; ++i) {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Set brewTemp" + String(i + 1) + ":");
@@ -104,7 +104,7 @@ int Brewing::mash()
     float temp;
 
     // MASHING PAUSES
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < MAX_PAUSES_MASHING; ++i) {
         digitalWrite(connectors.buzzer, LOW);
 
         if ((_mashTime[i] == 0) || (_mashTemperature[i] == 0)) {
@@ -196,6 +196,87 @@ int Brewing::mash()
     while (kpd.waitForKey() != 'A'); // Wait for button A
 }
 
+int Brewing::brew()
+{
+    _lcd.clear();
+    _lcd.setCursor(0, 0);
+    _lcd.print("Begin brewing");
+    while (_kpd.waitForKey() != 'A'); // Wait for button A
+
+    heatUp(_brewTemperature[0]);
+
+    bool buzz, power = false;
+    unsigned long miliseconds, minutes, seconds;
+    float temp;
+
+    // BREWING PAUSES
+    for (int i = 0; i < MAX_PAUSES_BREWING; ++i) {
+        digitalWrite(connectors.buzzer, LOW);
+
+        if ((_brewTime[i] == 0) || (_brewTemperature[i] == 0)) {
+            break;
+        }
+
+        _timPause.begin(MINS(_brewTime[i]));
+
+        while (!_timPause.available()) {
+            temp = temperature();
+
+            miliseconds = _timPause.time() / 1000;
+            minutes = miliseconds / 60;
+            seconds = miliseconds % 60;
+
+            _lcd.clear();
+            _lcd.setCursor(0, 0);
+            _lcd.print("Time left: ");
+            _lcd.print(minutes);
+            _lcd.print(".");
+            _lcd.print(seconds);
+            _lcd.setCursor(0, 1);
+            _lcd.print(temp);
+
+            if (_kpd.getKey() == 'D') { // Enable or disable heating regardless of temperature
+                if (power == true) {
+                    power = false;    
+                } else {
+                    power = true;
+                }
+            }
+
+            if (power == true) {
+                digitalWrite(connectors.heater, HIGH);
+                _lcd.setCursor(15, 1);
+                _lcd.print("P");
+            } else {
+                if (temp < (_brewTemperature[i] - 1)) {
+                    digitalWrite(connectors.heater, HIGH);
+                }
+                if (temp > _brewTemperature[i] + 1) {
+                    digitalWrite(connectors.heater, LOW);
+                }
+            }
+
+            if (_timPause.time() < SECS(10)) {
+                if (_timBuzzer.available()) {
+                    _timBuzzer.begin(500);
+                    if (buzz == false) {
+                        digitalWrite(connectors.buzzer, HIGH);
+                        buzz = true;
+                    } else {
+                        digitalWrite(connectors.buzzer, LOW);
+                        buzz = false;
+                    }
+                }
+            }
+
+        }
+    }
+
+    digitalWrite(connectors.buzzer, LOW);
+    digitalWrite(connectors.heater, LOW);
+    digitalWrite(connectors.pump, LOW);
+}
+
 int Brewing::heatUp(int desiredTemp)
 {
     if(desiredTemp == 0) return -1;
@@ -218,6 +299,10 @@ int Brewing::heatUp(int desiredTemp)
         _lcd.print("Heating up");
         _lcd.setCursor(0, 1);
         _lcd.print(temp);
+
+        if (kpd.getKey() == 'D') {
+            break;    // Stop heating if user wants to
+        }
     }
     digitalWrite(connectors.heater, LOW);
     digitalWrite(connectors.buzzer, HIGH);
