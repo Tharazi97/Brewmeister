@@ -11,6 +11,15 @@ batchSize{ medium }
     _lcd = lcd;
     _kpd = kpd;
     _thermometer = thermometer;
+
+    pinMode(connectors.heater, OUTPUT);
+    pinMode(connectors.pump, OUTPUT);
+    pinMode(connectors.buzzer, OUTPUT);
+    pinMode(connectors.sensorLow, INPUT);
+    pinMode(connectors.sensorHigh, INPUT);
+
+    _lcd.begin(16, 2);
+
     _timPause.begin(200);
     _timBuzzer.begin(200);
     delay(200);
