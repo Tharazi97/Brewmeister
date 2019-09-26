@@ -474,15 +474,13 @@ float Brewing::temperature(OneWire thermometer)
     return (float)raw / 16.0;
 }
 
-Brewing::BatchSize Brewing::setBatchSize(LiquidCrystal lcd, Keypad kpd)
+void Brewing::setBatchSize(LiquidCrystal lcd, Keypad kpd)
 {
-    BatchSize batchSize = medium;
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Set batchSize:");
     char key;
-    bool finished = false;
-    while (!finished) {
+    while (true) {
       key = kpd.waitForKey();
       switch (key) {
         case '1':
@@ -526,11 +524,11 @@ Brewing::BatchSize Brewing::setBatchSize(LiquidCrystal lcd, Keypad kpd)
             
         case 'A':
             delay(200);
-            return batchSize;
+            return;
 
         case 'B':
             delay(200);
-            return medium;
+            return;
       }
     }
 }
