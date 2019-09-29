@@ -2,6 +2,7 @@
 #include <Keypad.h>
 #include <OneWire.h>
 #include <inttypes.h>
+#include <Timers.h>
 
 #define MAX_PAUSES_MASHING 10
 #define MAX_PAUSES_BREWING 10
@@ -17,12 +18,13 @@ struct Connecting {
 
 class Brewing {
 public:
-    explicit Brewing();
     Brewing(LiquidCrystal lcd, Keypad kpd, OneWire thermometer, Connecting connectors);
 
     enum BatchSize { small, medium, big};
 
-    void setBatchSize(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd);
+    void setBatchSize(LiquidCrystal lcd, Keypad kpd);
+    void setBatchSize();
+
     void setLcd(LiquidCrystal lcd);
     void setKeypad(Keypad kpd);
     void setThermometer(OneWire thermometer);
@@ -33,12 +35,14 @@ public:
     * Press B to cancel entering value.
     * Press C to delete last character.
     */
-    int readKeypad(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd);
+    int readKeypad(LiquidCrystal lcd, Keypad kpd);
+    int readKeypad();
 
     /*
     * Function returns temperature in celsius degrees as float.
     */
-    float temperature(OneWire thermometer = _thermometer);
+    float temperature(OneWire thermometer);
+    float temperature();
 
     /*
     * Function sets the temperature and time of each mashing pause.
@@ -47,7 +51,8 @@ public:
     * Press B to cancel entering value.
     * Press C to delete last character.
     */
-    void programMashing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd);
+    void programMashing(LiquidCrystal lcd, Keypad kpd);
+    void programMashing();
 
     /*
     * Function sets the temperature and time of each brewing pause.
@@ -57,7 +62,8 @@ public:
     * Press B to cancel entering value.
     * Press C to delete last character.
     */
-    void programBrewing(LiquidCrystal lcd = _lcd, Keypad kpd = _kpd);
+    void programBrewing(LiquidCrystal lcd, Keypad kpd);
+    void programBrewing();
 
     int mash();
     int brew();
@@ -65,19 +71,20 @@ public:
     int heatUp(int desiredTemp);
     int fill(int desiredTemp);
 
-private:
+public:
     LiquidCrystal _lcd;
     Keypad _kpd;
     OneWire _thermometer;
 
-    int _mashTemperature[MAX_PAUSES_MASHING];
-    unsigned long _mashTime[MAX_PAUSES_MASHING];
+    int _mashTemperature[MAX_PAUSES_MASHING] = {};
+    unsigned long _mashTime[MAX_PAUSES_MASHING] = {};
 
-    int _brewTemperature[MAX_PAUSES_BREWING];
-    unsigned long _brewTime[MAX_PAUSES_BREWING];
+    int _brewTemperature[MAX_PAUSES_BREWING] = {};
+    unsigned long _brewTime[MAX_PAUSES_BREWING] = {};
 
     Timer _timPause;
     Timer _timBuzzer;
+    Timer _timPump;
 
 public:
     Connecting connectors;

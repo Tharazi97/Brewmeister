@@ -4,7 +4,7 @@
 #include <OneWire.h>
 #include "Brewing.h"
 
-struct Connecting connectors = { heater = 3, pump = 2, buzzer = 6, sensorLow = 13, sensorHigh = 12 };
+struct Connecting connectors = { .heater = 3, .pump = 2, .buzzer = 6, .sensorLow = 13, .sensorHigh = 12 };
 LiquidCrystal lcd(49, 47, 45, 43, 41, 40);
 OneWire  thermometer(11);
 
@@ -18,11 +18,11 @@ char keys[ROWS][COLS] = {
 };
 byte rowPins[ROWS] = {24, 25, 26, 27};
 byte colPins[COLS] = {28, 29, 30, 31};
-Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup(void)
 {
-    //Serial.begin(9600);
+    Serial.begin(9600);
 }
 
 void loop(void)
