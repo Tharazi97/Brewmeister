@@ -33,6 +33,26 @@ void loop(void)
 
     brewmeister.programMashing();
     brewmeister.programBrewing();
+    Serial.print(brewmeister.batchSize);
+    Serial.print("mash:");
+    for(int i = 0; i < 10; ++i)
+    {
+      Serial.print(brewmeister._mashTemperature[i]);
+    }
+    for(int i = 0; i < 10; ++i)
+    {
+      Serial.print(brewmeister._mashTime[i]);
+    }
+    Serial.print("brew:");
+    for(int i = 0; i < 10; ++i)
+    {
+      Serial.print(brewmeister._brewTemperature[i]);
+    }
+    for(int i = 0; i < 10; ++i)
+    {
+      Serial.print(brewmeister._brewTime[i]);
+    }
+    
 
     brewmeister.mash();
     brewmeister.brew();

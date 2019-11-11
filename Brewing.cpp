@@ -148,17 +148,19 @@ int Brewing::mash()
             } else if (batchSize == big) {
                 if (digitalRead(connectors.sensorHigh) == LOW) {
                     digitalWrite(connectors.pump, HIGH);
-                    _timPump.begin(SECS(10));
+                    _timPump.begin(SECS(45));
                 } else if (_timPump.available()) {
                     digitalWrite(connectors.pump, LOW);
                 }
-            } else {
+            } else if (batchSize == small) {
                 if (digitalRead(connectors.sensorLow) == HIGH) {
                     digitalWrite(connectors.pump, LOW);
-                    _timPump.begin(SECS(10));
+                    _timPump.begin(SECS(45));
                 } else if (_timPump.available()) {
                     digitalWrite(connectors.pump, HIGH);
                 }
+            } else if (batchSize == pot) {
+                digitalWrite(connectors.pump, HIGH);
             }
 
         }
@@ -339,7 +341,7 @@ int Brewing::fill(int desiredTemp)
                 digitalWrite(connectors.heater, LOW);
             }
         }
-    } else {
+    } else if ((batchSize == small) || (batchSize == medium)) {
         while (digitalRead(connectors.sensorLow) == LOW) {
             digitalWrite(connectors.pump, HIGH);
 
@@ -613,6 +615,19 @@ void Brewing::setBatchSize(LiquidCrystal lcd, Keypad kpd)
 
                 lcd.setCursor(0, 1);
                 lcd.print("big");
+                lcd.blink();
+
+                delay(20);
+                break;
+
+            case '4':
+                batchSize = pot;
+
+                lcd.setCursor(0, 1);
+                lcd.print("                ");
+
+                lcd.setCursor(0, 1);
+                lcd.print("mash in pot");
                 lcd.blink();
 
                 delay(20);

@@ -20,7 +20,7 @@ class Brewing {
 public:
     Brewing(LiquidCrystal lcd, Keypad kpd, OneWire thermometer, Connecting connectors);
 
-    enum BatchSize { small, medium, big};
+    enum BatchSize { small, medium, big, pot};
 
     void setBatchSize(LiquidCrystal lcd, Keypad kpd);
     void setBatchSize();
